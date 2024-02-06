@@ -1,20 +1,13 @@
 class Node{
-  constructor(data) {
+  constructor(data, parent) {
     this.data = data
     this.left = null
     this.right = null
+    this.parent = parent
   }
 
   assignSubtree(value) { // left < root < right
     return this.data < value ? "right" : "left"
-  }
-
-  hasTwoChildren() {
-    return !!this.left && !!this.right
-  }
-
-  onlyChild() {
-    return this.left == null ? this.right : this.left
   }
 }
 
@@ -23,61 +16,68 @@ class Tree{
     this.root = this.buildTree(array.sort((a, b) => a - b), 0, array.length - 1) 
   }
 
-  buildTree(arr, start, end) {
+  buildTree(arr, start, end, parent = null) {
     if(start > end) return null
 
     const mid = Math.floor((start + end) / 2)
-    const root = new Node(arr[mid])
-    root.left = this.buildTree(arr, start, mid - 1)
-    root.right = this.buildTree(arr, mid + 1, end)
+    const root = new Node(arr[mid], parent)
+    root.left = this.buildTree(arr, start, mid - 1, root)
+    root.right = this.buildTree(arr, mid + 1, end, root)
     return root
   }
 
-  insert(value, node = this.root) {
-    if(node == null) return new Node(value) // insert leaf
+  insert(value, node = this.root, parent = null) {
+    if(node == null) return new Node(value)
     const sub = node.assignSubtree(value)
-    node[sub] = this.insert(value, node[sub])
+    node[sub] = this.insert(value, node[sub], node)
     return node
   }
 
-  delete(value, node = this.root) {
-    if(node == null) return node
-    
-    // find node to delete
-    if(node.data !== value) {
-      const sub = node.assignSubtree(value)
-      node[sub] = this.delete(value, node[sub])
-      return node
+  find(value, node = this.root) {
+    if(node == null || node.data == value) return node
+    return this.find(value, node[node.assignSubtree(value)])
+  }
+
+  delete(value) {
+    let node = this.find(value)
+
+    // node has one child or no children
+    if(!(!!node.left && !!node.right)) {
+      const heir = node[node.left == null ? "right" : "left"]
+
+      if(node.parent) {
+        if(node.parent.left == node) {
+          node.parent.left = heir
+        } else {
+          node.parent.right = heir
+        }
+      } else {
+        this.root = heir
+      }
+
+      if(heir) {
+        heir.parent = node.parent
+      }
+    } else{
+      // node has two children
+      let successor = node.right
+
+      // leftmost node of right subtree is successor
+      while(successor.left !== null) {
+        successor = successor.left
+      }
+
+      // shift right child of successor
+      if(successor.parent == node) {
+        successor.parent.right = successor.right
+      } else {
+        successor.parent.left = successor.right
+      }
+
+      // copy successor data to "deleted" node
+      node.data = successor.data
+      successor = null
     }
-
-    // node has one child
-    if(!node.hasTwoChildren()) {
-      const heir = node.onlyChild()
-      node = null
-      return heir
-    }
-
-    // node has two children
-    let parent = node
-    let successor = node.right
-
-    // leftmost node of right subtree is successor
-    while(successor.left !== null) {
-      parent = successor
-      successor = successor.left
-    }
-
-    // shift right child of successor
-    if(parent == node) {
-      parent.right = successor.right
-    } else {
-      parent.left = successor.right
-    }
-
-    // copy successor data to "deleted" node
-    node.data = successor.data
-    successor = null
-    return node
   }
 
   parseTree(node = this.root, prefix = "", isLeft = true) {
