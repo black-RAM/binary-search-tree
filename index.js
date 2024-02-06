@@ -4,6 +4,18 @@ class Node{
     this.left = null
     this.right = null
   }
+
+  assignSubtree(value) { // left < root < right
+    return this.data < value ? "right" : "left"
+  }
+
+  hasTwoChildren() {
+    return !!this.left && !!this.right
+  }
+
+  onlyChild() {
+    return this.left == null ? this.right : this.left
+  }
 }
 
 class Tree{
@@ -22,20 +34,49 @@ class Tree{
   }
 
   insert(value, node = this.root) {
-    if(node == null) {
-      return new Node(value) // node inserted as leaf
+    if(node == null) return new Node(value) // insert leaf
+    const sub = node.assignSubtree(value)
+    node[sub] = this.insert(value, node[sub])
+    return node
+  }
+
+  delete(value, node = this.root) {
+    if(node == null) return node
+    
+    // find node to delete
+    if(node.data !== value) {
+      const sub = node.assignSubtree(value)
+      node[sub] = this.delete(value, node[sub])
+      return node
     }
 
-    if(node.data == value) {
-      return node // prevent duplicate
+    // node has one child
+    if(!node.hasTwoChildren()) {
+      const heir = node.onlyChild()
+      node = null
+      return heir
     }
 
-    if(node.data < value) { // keys(left) < key(root) < keys(right)
-      node.right = this.insert(value, node.right)
+    // node has two children
+    let parent = node
+    let successor = node.right
+
+    // leftmost node of right subtree is successor
+    while(successor.left !== null) {
+      parent = successor
+      successor = successor.left
+    }
+
+    // shift right child of successor
+    if(parent == node) {
+      parent.right = successor.right
     } else {
-      node.left = this.insert(value, node.left)
+      parent.left = successor.right
     }
 
+    // copy successor data to "deleted" node
+    node.data = successor.data
+    successor = null
     return node
   }
 
@@ -51,9 +92,6 @@ class Tree{
   }
 }
 
-const randomNumbers = Array.from({length: 12}, () => parseInt(Math.random() * 100))
-const bst = new Tree([50])
-for (const number of randomNumbers) {
-  bst.insert(number)
-}
+const bst = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 67, 6345, 324])
+bst.delete(23)
 bst.parseTree()
