@@ -38,12 +38,12 @@ class Tree{
     return this.find(value, node[node.assignSubtree(value)])
   }
 
-  delete(value) {
-    let node = this.find(value)
+  delete(value, tree = this.root) {
+    let node = this.find(value, tree)
 
     // node has one child or no children
     if(!(!!node.left && !!node.right)) {
-      const heir = node[node.left == null ? "right" : "left"]
+      const heir = node[!node.left ? "right" : "left"]
 
       if(node.parent) {
         if(node.parent.left == node) {
@@ -80,6 +80,19 @@ class Tree{
     }
   }
 
+  levelOrder(operator = ((el, arr = []) => {arr.push(el.data)}), node = this.root) {
+    const queue = []
+    const data = []
+    queue.push(node)
+    while(queue.length > 0) {
+      const current = queue.shift()
+      operator(current, data)
+      if(current.left) queue.push(current.left)
+      if(current.right) queue.push(current.right)
+    }
+    return data
+  }
+
   parseTree(node = this.root, prefix = "", isLeft = true) {
     if (node === null) return
     if (node.right !== null) {
@@ -93,5 +106,5 @@ class Tree{
 }
 
 const bst = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 67, 6345, 324])
-bst.delete(23)
+console.log(bst.levelOrder((el) => {el.data = el.data * 2}))
 bst.parseTree()
