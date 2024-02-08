@@ -40,6 +40,7 @@ class Tree{
 
   delete(value, tree = this.root) {
     let node = this.find(value, tree)
+    if(node == null) return
 
     // node has one child or no children
     if(!(!!node.left && !!node.right)) {
@@ -94,6 +95,43 @@ class Tree{
     return data
   }
 
+  preOrder(mutator = (el => el), node = this.root, data = []) {
+    if(node == null) return
+
+    node.data = mutator(node.data)
+    data.push(node.data)
+
+    this.preOrder(mutator, node.left, data)
+    this.preOrder(mutator, node.right, data)
+
+    return data
+  }
+
+  inOrder(mutator = (el => el), node = this.root, data = []) {
+    if(node == null) return
+
+    this.inOrder(mutator, node.left, data)
+
+    node.data = mutator(node.data)
+    data.push(node.data)
+      
+    this.inOrder(mutator, node.right, data)
+
+    return data
+  }
+
+  postOrder(mutator = (el => el), node = this.root, data = []) {
+    if(node == null) return
+
+    this.postOrder(mutator, node.left, data)
+    this.postOrder(mutator, node.right, data)
+
+    node.data = mutator(node.data)
+    data.push(node.data)
+
+    return data
+  }
+
   parseTree(node = this.root, prefix = "", isLeft = true) {
     if (node === null) return
     if (node.right !== null) {
@@ -107,5 +145,5 @@ class Tree{
 }
 
 const bst = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 67, 6345, 324])
-console.log(bst.levelOrder(num => num * 2))
+console.log(bst.inOrder(n => n + 2))
 bst.parseTree()
