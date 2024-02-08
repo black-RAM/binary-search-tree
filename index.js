@@ -80,13 +80,14 @@ class Tree{
     }
   }
 
-  levelOrder(operator = ((el, arr = []) => {arr.push(el.data)}), node = this.root) {
+  levelOrder(mutator = (el => el), node = this.root) {
     const queue = []
     const data = []
     queue.push(node)
     while(queue.length > 0) {
       const current = queue.shift()
-      operator(current, data)
+      current.data = mutator(current.data)
+      data.push(current.data)
       if(current.left) queue.push(current.left)
       if(current.right) queue.push(current.right)
     }
@@ -106,5 +107,5 @@ class Tree{
 }
 
 const bst = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 67, 6345, 324])
-console.log(bst.levelOrder((el) => {el.data = el.data * 2}))
+console.log(bst.levelOrder(num => num * 2))
 bst.parseTree()
