@@ -38,8 +38,8 @@ class Tree{
     return this.find(value, node[node.assignSubtree(value)])
   }
 
-  delete(value, tree = this.root) {
-    let node = this.find(value, tree)
+  delete(value, node = this.root) {
+    node = this.find(value, node)
     if(node == null) return
 
     // node has one child or no children
@@ -142,6 +142,12 @@ class Tree{
     return this.depth(target, node[node.assignSubtree(target.data)], edges + 1)
   }
 
+  isBalanced(tree = this.root) {
+    if(tree == null) return true
+    const diff = Math.abs(this.height(tree.left) - this.height(tree.right))
+    return diff <= 1 && this.isBalanced(tree.left) && this.isBalanced(tree.right)
+  }
+
   parseTree(node = this.root, prefix = "", isLeft = true) {
     if (node === null) return
     if (node.right !== null) {
@@ -154,6 +160,10 @@ class Tree{
   }
 }
 
-const bst = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 67, 6345, 324])
-console.log(bst.height())
+const inputs = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 67, 6345, 324]
+const bst = new Tree([1])
+for (const input of inputs) {
+  bst.insert(input)
+}
+console.log(bst.isBalanced())
 bst.parseTree()
