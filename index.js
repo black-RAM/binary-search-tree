@@ -148,6 +148,13 @@ class Tree{
     return diff <= 1 && this.isBalanced(tree.left) && this.isBalanced(tree.right)
   }
 
+  balance(tree = this.root) { // also removes duplicates
+    if(this.isBalanced(tree)) return tree
+    const data = [...new Set(this.inOrder(el => el, tree))]
+    tree = this.buildTree(data, 0, data.length - 1)
+    return tree
+  }
+
   parseTree(node = this.root, prefix = "", isLeft = true) {
     if (node === null) return
     if (node.right !== null) {
@@ -158,6 +165,16 @@ class Tree{
       this.parseTree(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true)
     }
   }
+
+  // impure methods: mutate this.root
+  rebalance(){
+    this.root = this.balance()
+  }
+
+  insertBalanced(value) {
+    this.insert(value)
+    this.rebalance()
+  }
 }
 
 const inputs = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 67, 6345, 324]
@@ -165,5 +182,8 @@ const bst = new Tree([1])
 for (const input of inputs) {
   bst.insert(input)
 }
-console.log(bst.isBalanced())
 bst.parseTree()
+console.log("Tree balanced? ", bst.isBalanced())
+bst.rebalance()
+bst.parseTree()
+console.log("Tree balanced? ", bst.isBalanced())
