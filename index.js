@@ -132,6 +132,16 @@ class Tree{
     return data
   }
 
+  height(node = this.root) {
+    if(node == null) return -1
+    return 1 + Math.max(this.height(node.left), this.height(node.right))
+  }
+
+  depth(target = this.root, node = this.root, edges = 0) {
+    if(node == target) return edges
+    return this.depth(target, node[node.assignSubtree(target.data)], edges + 1)
+  }
+
   parseTree(node = this.root, prefix = "", isLeft = true) {
     if (node === null) return
     if (node.right !== null) {
@@ -145,5 +155,5 @@ class Tree{
 }
 
 const bst = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 67, 6345, 324])
-console.log(bst.inOrder(n => n + 2))
+console.log(bst.height())
 bst.parseTree()
