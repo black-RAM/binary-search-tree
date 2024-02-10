@@ -168,7 +168,7 @@ class Tree{
 }
 
 // driver script
-// let input = Array.from({length: 40}, () => parseInt(Math.random() * 100))
+let input = Array.from({length: 40}, () => parseInt(Math.random() * 100))
 const bst = new Tree(input)
 console.log("Binary Search Tree (40 Numbers less than 100): ")
 bst.parseTree()
