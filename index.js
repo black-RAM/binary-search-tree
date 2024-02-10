@@ -14,7 +14,7 @@ class Node{
 class Tree{
   constructor(array) {
     const input = [...new Set(array.sort((a, b) => a - b))]
-    this.root = this.buildTree(input, 0, array.length - 1) 
+    this.root = this.buildTree(input, 0, input.length - 1) 
   }
 
   buildTree(arr, start, end, parent = null) {
@@ -106,7 +106,7 @@ class Tree{
     return diff <= 1 && this.isBalanced(tree.left) && this.isBalanced(tree.right)
   }
 
-  balance(tree = this.root) { // also removes duplicates
+  balance(tree = this.root) {
     if(this.isBalanced(tree)) return tree
     const data = [...new Set(this.inOrder(el => el, tree))]
     tree = this.buildTree(data, 0, data.length - 1)
@@ -127,11 +127,6 @@ class Tree{
   // impure methods: mutate this.root
   rebalance(){
     this.root = this.balance()
-  }
-
-  insertBalanced(value) {
-    this.insert(value)
-    this.rebalance()
   }
 
   delete(value) {
@@ -179,9 +174,9 @@ class Tree{
 }
 
 // driver script
-let input = Array.from({length: 20}, () => parseInt(Math.random() * 100))
+let input = Array.from({length: 40}, () => parseInt(Math.random() * 100))
 const bst = new Tree(input)
-console.log("Binary Search Tree: ")
+console.log("Binary Search Tree (40 Numbers less than 100): ")
 bst.parseTree()
 console.log("Tree is balanced: ", bst.isBalanced())
 console.log("Level order: ", bst.levelOrder())
@@ -189,7 +184,8 @@ console.log("Pre-order: ", bst.preOrder())
 console.log("Post-order: ", bst.postOrder())
 console.log("In-order: ", bst.inOrder())
 
-input = Array.from({length: 20}, () => 100 + parseInt(Math.random() * 100))
+console.log("Binary Search Tree (with 40 numbers over 100): ")
+input = Array.from({length: 40}, () => 100 + parseInt(Math.random() * 100))
 for (const n of input) {
   bst.insert(n)
 }
