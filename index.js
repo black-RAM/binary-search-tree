@@ -1,9 +1,8 @@
 class Node{
-  constructor(data, parent) {
+  constructor(data) {
     this.data = data
     this.left = null
     this.right = null
-    this.parent = parent
   }
 
   assignSubtree(value) { // left < root < right
@@ -17,20 +16,60 @@ class Tree{
     this.root = this.buildTree(input, 0, input.length - 1) 
   }
 
-  buildTree(arr, start, end, parent = null) {
+  buildTree(arr, start, end) {
     if(start > end) return null
 
     const mid = Math.floor((start + end) / 2)
-    const root = new Node(arr[mid], parent)
+    const root = new Node(arr[mid])
     root.left = this.buildTree(arr, start, mid - 1, root)
     root.right = this.buildTree(arr, mid + 1, end, root)
     return root
   }
 
-  insert(value, node = this.root, parent = null) {
-    if(node == null) return new Node(value, parent)
+  insert(value, node = this.root) {
+    if(node == null) return new Node(value)
     const sub = node.assignSubtree(value)
     node[sub] = this.insert(value, node[sub], node)
+    return node
+  }
+  
+  delete(value, node = this.root) {
+    if(node == null) return node
+    
+    // find node to delete
+    if(node.data !== value) {
+      const sub = node.assignSubtree(value)
+      node[sub] = this.delete(value, node[sub])
+      return node
+    }
+
+    // node has one child
+    if(!(node.left && node.right)) {
+      const heir = node[!node.left ? "right" : "left"]
+      node = null
+      return heir
+    }
+
+    // node has two children
+    let parent = node
+    let successor = node.right
+
+    // leftmost node of right subtree is successor
+    while(successor.left !== null) {
+      parent = successor
+      successor = successor.left
+    }
+
+    // shift right child of successor
+    if(parent == node) {
+      parent.right = successor.right
+    } else {
+      parent.left = successor.right
+    }
+
+    // copy successor data to "deleted" node
+    node.data = successor.data
+    successor = null
     return node
   }
 
@@ -124,52 +163,9 @@ class Tree{
     }
   }
 
-  // impure methods: mutate this.root
+  // impure method: mutates this.root
   rebalance(){
     this.root = this.balance()
-  }
-
-  delete(value) {
-    node = this.find(value)
-    if(node == null) return
-
-    // node has one child or no children
-    if(!(!!node.left && !!node.right)) {
-      const heir = node[!node.left ? "right" : "left"]
-
-      if(node.parent) {
-        if(node.parent.left == node) {
-          node.parent.left = heir
-        } else {
-          node.parent.right = heir
-        }
-      } else {
-        this.root = heir
-      }
-
-      if(heir) {
-        heir.parent = node.parent
-      }
-    } else{
-      // node has two children
-      let successor = node.right
-
-      // leftmost node of right subtree is successor
-      while(successor.left !== null) {
-        successor = successor.left
-      }
-
-      // shift right child of successor
-      if(successor.parent == node) {
-        successor.parent.right = successor.right
-      } else {
-        successor.parent.left = successor.right
-      }
-
-      // copy successor data to "deleted" node
-      node.data = successor.data
-      successor = null
-    }
   }
 }
 
