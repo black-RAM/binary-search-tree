@@ -32,23 +32,21 @@ class Tree{
     node[sub] = this.insert(value, node[sub], node)
     return node
   }
-  
+
   delete(value, node = this.root) {
-    if(node == null) return node
+    if(node == null) return null
     
-    // find node to delete
+    // fine node
     if(node.data !== value) {
       const sub = node.assignSubtree(value)
       node[sub] = this.delete(value, node[sub])
       return node
     }
 
-    // node has one child
-    if(!(node.left && node.right)) {
-      const heir = node[!node.left ? "right" : "left"]
-      node = null
-      return heir
-    }
+    // node found
+    if(!node.left && !node.right) return null
+    if (!node.left) return node.right
+    if (!node.right) return node.left
 
     // node has two children
     let parent = node
@@ -67,7 +65,7 @@ class Tree{
       parent.left = successor.right
     }
 
-    // copy successor data to "deleted" node
+    // copy successor data to deleted node
     node.data = successor.data
     successor = null
     return node
@@ -170,7 +168,7 @@ class Tree{
 }
 
 // driver script
-let input = Array.from({length: 40}, () => parseInt(Math.random() * 100))
+// let input = Array.from({length: 40}, () => parseInt(Math.random() * 100))
 const bst = new Tree(input)
 console.log("Binary Search Tree (40 Numbers less than 100): ")
 bst.parseTree()
